@@ -48,7 +48,21 @@ public class MainActivity extends AppCompatActivity {
         //TODO 6.4 Retrieve the user input from the EditText
         //TODO 6.5 - 6.9 Modify GetComic below
         //TODO 6.10 If network is active, instantiate GetComic and call the execute method
+        editTextComicNo = findViewById(R.id.editTextComicNo);
+        buttonGetComic = findViewById(R.id.buttonGetComic);
+        textViewTitle = findViewById(R.id.textViewTitle);
+        imageViewComic = findViewById(R.id.imageViewComic);
 
+        buttonGetComic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                comicNo = editTextComicNo.getText().toString();
+                if (Utils.isNetworkAvailable(MainActivity.this)){
+                    GetComic getcomic = new GetComic();
+                    getcomic.execute(comicNo);
+                }
+            }
+        });
     }
 
     //TODO 6.5 - 6.9 ****************
@@ -58,9 +72,41 @@ public class MainActivity extends AppCompatActivity {
     //TODO 6.7 (onProgressUpdate, doInBackground) Call publishProgress, write code to update textViewTitle with the image URL
     //TODO 6.8 (doInBackground)Call Utils.getBitmap using the URL to get the bitmap
     //TODO 6.9 (onPostExecute)Assign the Bitmap downloaded to imageView. The bitmap may be null.
-    class GetComic {
+    class GetComic extends AsyncTask<String,String,Bitmap>{
 
 
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            try {
+                String imageurlstring = Utils.getImageURLFromXkcdApi(comicNo);
+
+                int slash = imageurlstring.lastIndexOf("/");
+                int dot = imageurlstring.lastIndexOf(".");
+                String comictitle = imageurlstring.substring(slash+1,dot);
+                publishProgress(comictitle);
+                URL imageurl = new URL(imageurlstring);
+                Bitmap bitmap = Utils.getBitmap(imageurl);
+                return bitmap;
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            textViewTitle.setText(values[0]);
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            imageViewComic.setImageBitmap(bitmap);
+            Log.i("bla","postexecute");
+        }
     }
 
 }
