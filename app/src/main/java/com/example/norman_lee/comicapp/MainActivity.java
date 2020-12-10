@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         //TODO 6.4 Retrieve the user input from the EditText
         //TODO 6.5 - 6.9 Modify GetComic below
         //TODO 6.10 If network is active, instantiate GetComic and call the execute method
+
         editTextComicNo = findViewById(R.id.editTextComicNo);
         buttonGetComic = findViewById(R.id.buttonGetComic);
         textViewTitle = findViewById(R.id.textViewTitle);
@@ -57,12 +58,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 comicNo = editTextComicNo.getText().toString();
-                if (Utils.isNetworkAvailable(MainActivity.this)){
-                    GetComic getcomic = new GetComic();
-                    getcomic.execute(comicNo);
+                GetComic getComic = new GetComic();
+                if(Utils.isNetworkAvailable(MainActivity.this)) {
+                    getComic.execute();
                 }
             }
         });
+
     }
 
     //TODO 6.5 - 6.9 ****************
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 int dot = imageurlstring.lastIndexOf(".");
                 String comictitle = imageurlstring.substring(slash+1,dot);
                 publishProgress(comictitle);
+
                 URL imageurl = new URL(imageurlstring);
                 Bitmap bitmap = Utils.getBitmap(imageurl);
                 return bitmap;
@@ -105,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
             imageViewComic.setImageBitmap(bitmap);
-            Log.i("bla","postexecute");
         }
     }
 
